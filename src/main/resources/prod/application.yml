@@ -1,0 +1,32 @@
+server:
+  port: 8084
+  tomcat.accesslog.enabled : true
+  context-path: /carPlateform
+
+spring:
+  application:
+    name: shop-partner
+mybatis:
+  mapper-locations: "classpath*:mybatis/*.xml"
+  configuration:
+    mapUnderscoreToCamelCase: true
+logging:
+  level:
+     com.zld.mapper : debug
+
+messageConfig:
+ messageSign: \u3010\u667a\u6167\u505c\u8f66\u4e91\u3011
+
+memcache:
+  servers: 10.29.254.36:11211
+  failover: true
+  initConn: 100
+  minConn: 20
+  maxConn: 1000
+  maintSleep: 50
+  nagel: false
+  socketTO: 3000
+  aliveCheck: true
+
+
+

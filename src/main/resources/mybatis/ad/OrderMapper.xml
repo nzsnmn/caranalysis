@@ -1,0 +1,881 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.bolink.mapper.addb.OrderMapper" >
+
+
+
+
+    <!--无牌车查询这个车场下面的在场订单-->
+    <select id="qryUnPayOrderByNoLicence"  resultType="map">
+
+        SELECT
+        *
+        FROM
+        ${tableName}
+        WHERE
+        car_number LIKE '%'||substr(#{carNumber,jdbcType=VARCHAR},1)
+        AND comid = #{comid,jdbcType=BIGINT}
+        AND state = 0
+        AND  ishd = 0
+        ORDER BY
+	    create_time DESC
+    </select>
+
+    <!--车牌精确查询这个车场下面的在场订单-->
+    <select id="qryUnPayOrderByCar"  resultType="map">
+
+        SELECT
+        *
+        FROM
+        ${tableName}
+        WHERE
+        car_number = #{carNumber,jdbcType=VARCHAR}
+        AND comid = #{comid,jdbcType=BIGINT}
+
+        AND state = 0
+        AND  ishd = 0
+        limit 1 OFFSET 0
+
+    </select>
+
+    <!--车牌模糊查询这个车场下面的在场订单-->
+    <select id="qryUnPayOrderByCarLike"  resultType="map">
+        SELECT
+        *
+        FROM
+        ${tableName}
+        WHERE
+        substr(car_number,2) = substr(#{carNumber,jdbcType=VARCHAR},2)
+        AND comid = #{comid,jdbcType=BIGINT}
+        AND state = 0
+        AND  ishd = 0
+        ORDER BY
+	    create_time DESC
+
+    </select>
+
+    <!--车牌查询这个车场下面的锁定的在场订单-->
+    <select id="qryLockedUnPayOrder"  resultType="int">
+        SELECT
+        count(*)
+        FROM
+        order_tb_new
+        WHERE
+        car_number = #{carNumber,jdbcType=VARCHAR}
+        AND state = 0
+        AND  ishd = 0
+        AND  islocked=1
+    </select>
+
+    <!--公众号绑定车牌时 更新订单 所属user-->
+    <update id="updateOrderToUin" >
+       UPDATE order_tb_new
+        SET uin = #{uin,jdbcType=BIGINT}
+        WHERE
+            car_number = #{carNumber,jdbcType=VARCHAR}
+        AND ishd = 0
+    </update>
+
+    <!--查询本地订单号是不是唯一-->
+    <select id="qryCountByOrderId" resultType="int">
+        SELECT
+            COUNT (*)
+        FROM
+            ${tableName}
+        WHERE
+            order_id_local = #{orderIdLocal,jdbcType=VARCHAR}
+        AND comid = #{comid,jdbcType=BIGINT}
+
+        AND ishd = 0
+    </select>
+
+    <!--车辆进场 零元结算 这辆车在这个场内的订单 -->
+    <update id="updateOrderZero" >
+        UPDATE ${tableName}
+        SET total=0,
+        STATE = 1,
+        out_uid = #{outUid,jdbcType=BIGINT},
+        end_time = extract(epoch from now())
+        WHERE
+        car_number = #{carNumber,jdbcType=VARCHAR}
+        AND
+        comid = #{comid,jdbcType=BIGINT}
+        AND ishd = 0
+        AND STATE = 0
+
+    </update>
+
+    <!--出场时查询这辆车 的在场-->
+    <select id="qryInCountByCarAndOrderId" resultType="int">
+        SELECT
+        COUNT (*)
+        FROM
+        ${tableName}
+        WHERE
+        order_id_local = #{orderIdLocal,jdbcType=VARCHAR}
+        AND comid = #{comid,jdbcType=BIGINT}
+        AND car_number = #{carNumber,jdbcType=VARCHAR}
+
+        AND ishd = 0
+        AND state = 0
+    </select>
+
+
+    <!--出场时查询这辆车 的在场-->
+    <select id="qryAllCountByCarAndOrderId" resultType="int">
+        SELECT
+        COUNT (*)
+        FROM
+        ${tableName}
+        WHERE
+        order_id_local = #{orderIdLocal,jdbcType=VARCHAR}
+        AND comid = #{comid,jdbcType=BIGINT}
+        AND car_number = #{carNumber,jdbcType=VARCHAR}
+
+        AND ishd = 0
+    </select>
+
+
+    <!--根据id查询订单-->
+    <select id="qryOrderById" resultType="map">
+        SELECT
+        *
+        FROM
+        ${tableName}
+        WHERE
+        id= #{id,jdbcType=BIGINT}
+        AND ishd = 0
+    </select>
+
+
+    <!--根据车牌号查询所有已经锁定的在场订单-->
+    <select id="qryOrderListByCarNumber" resultType="map">
+        SELECT
+        *
+        FROM
+        order_tb_new
+        WHERE
+        car_number = #{carNumber,jdbcType=VARCHAR}
+        AND ishd = 0
+        AND state = 0
+        AND  islocked =1
+    </select>
+
+    <!--根据车牌号查询所有已经锁定的在场订单-->
+    <select id="qryAllOrderListByCarNumber" resultType="map">
+        SELECT
+        *
+        FROM
+        order_tb_new
+        WHERE
+        car_number = #{carNumber,jdbcType=VARCHAR}
+        AND ishd = 0
+        AND state = 0
+    </select>
+
+    <update id="updateLockStatus">
+        UPDATE ${tableName}
+        SET islocked = #{islocked,jdbcType=SMALLINT}
+        WHERE
+        id = #{id,jdbcType=BIGINT}
+        AND ishd = 0
+
+    </update>
+
+
+    <update id="updateLockStatusByOrderIdLocal">
+        UPDATE ${tableName}
+        SET islocked = #{state,jdbcType=SMALLINT}
+        WHERE
+        order_id_local = #{orderIdLocal,jdbcType=VARCHAR}
+        AND ishd = 0
+
+    </update>
+
+    <update id="updateLockStatusAndKey">
+        UPDATE ${tableName}
+        SET islocked = #{islocked,jdbcType=SMALLINT},
+        lock_key = #{lockKey,jdbcType=VARCHAR}
+        WHERE
+        id = #{id,jdbcType=BIGINT}
+        AND ishd = 0
+
+    </update>
+
+
+
+
+    <insert id="insertOrder"  >
+        insert into order_tb_new
+        <trim prefix="(" suffix=")" suffixOverrides="," >
+            <if test="id != null" >
+                id,
+            </if>
+            <if test="createTime != null" >
+                create_time,
+            </if>
+            <if test="comid != null" >
+                comid,
+            </if>
+            <if test="uin != null" >
+                uin,
+            </if>
+            <if test="total != null" >
+                total,
+            </if>
+            <if test="state != null" >
+                state,
+            </if>
+            <if test="endTime != null" >
+                end_time,
+            </if>
+            <if test="autoPay != null" >
+                auto_pay,
+            </if>
+            <if test="payType != null" >
+                pay_type,
+            </if>
+            <if test="nfcUuid != null" >
+                nfc_uuid,
+            </if>
+            <if test="uid != null" >
+                uid,
+            </if>
+            <if test="carNumber != null" >
+                car_number,
+            </if>
+            <if test="imei != null" >
+                imei,
+            </if>
+            <if test="pid != null" >
+                pid,
+            </if>
+            <if test="preState != null" >
+                pre_state,
+            </if>
+            <if test="type != null" >
+                type,
+            </if>
+            <if test="needSync != null" >
+                need_sync,
+            </if>
+            <if test="ishd != null" >
+                ishd,
+            </if>
+            <if test="isclick != null" >
+                isclick,
+            </if>
+            <if test="prepaid != null" >
+                prepaid,
+            </if>
+            <if test="prepaidPayTime != null" >
+                prepaid_pay_time,
+            </if>
+            <if test="berthnumber != null" >
+                berthnumber,
+            </if>
+            <if test="berthsecId != null" >
+                berthsec_id,
+            </if>
+            <if test="groupid != null" >
+                groupid,
+            </if>
+            <if test="outUid != null" >
+                out_uid,
+            </if>
+            <if test="isUnionUser != null" >
+                is_union_user,
+            </if>
+            <if test="carTypeZh != null" >
+                car_type_zh,
+            </if>
+            <if test="orderIdLocal != null" >
+                order_id_local,
+            </if>
+            <if test="duration != null" >
+                duration,
+            </if>
+            <if test="payTypeEn != null" >
+                pay_type_en,
+            </if>
+            <if test="freereasonsLocal != null" >
+                freereasons_local,
+            </if>
+            <if test="islocked != null" >
+                islocked,
+            </if>
+            <if test="lockKey != null" >
+                lock_key,
+            </if>
+            <if test="inPassid != null" >
+                in_passid,
+            </if>
+            <if test="outPassid != null" >
+                out_passid,
+            </if>
+            <if test="amountReceivable != null" >
+                amount_receivable,
+            </if>
+            <if test="electronicPrepay != null" >
+                electronic_prepay,
+            </if>
+            <if test="electronicPay != null" >
+                electronic_pay,
+            </if>
+            <if test="cashPrepay != null" >
+                cash_prepay,
+            </if>
+            <if test="cashPay != null" >
+                cash_pay,
+            </if>
+            <if test="reduceAmount != null" >
+                reduce_amount,
+            </if>
+            <if test="cType != null" >
+                c_type,
+            </if>
+            <if test="carType != null" >
+                car_type,
+            </if>
+            <if test="freereasons != null" >
+                freereasons,
+            </if>
+            <if test="remark != null" >
+                remark,
+            </if>
+            <if test="carpicTableName != null" >
+                carpic_table_name,
+            </if>
+            <if test="workStationUuid != null" >
+                work_station_uuid,
+            </if>
+            <if test="cityid != null" >
+                cityid,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides="," >
+            <if test="id != null" >
+                #{id,jdbcType=BIGINT},
+            </if>
+            <if test="createTime != null" >
+                #{createTime,jdbcType=BIGINT},
+            </if>
+            <if test="comid != null" >
+                #{comid,jdbcType=BIGINT},
+            </if>
+            <if test="uin != null" >
+                #{uin,jdbcType=BIGINT},
+            </if>
+            <if test="total != null" >
+                #{total,jdbcType=NUMERIC},
+            </if>
+            <if test="state != null" >
+                #{state,jdbcType=INTEGER},
+            </if>
+            <if test="endTime != null" >
+                #{endTime,jdbcType=BIGINT},
+            </if>
+            <if test="autoPay != null" >
+                #{autoPay,jdbcType=INTEGER},
+            </if>
+            <if test="payType != null" >
+                #{payType,jdbcType=INTEGER},
+            </if>
+            <if test="nfcUuid != null" >
+                #{nfcUuid,jdbcType=VARCHAR},
+            </if>
+            <if test="uid != null" >
+                #{uid,jdbcType=BIGINT},
+            </if>
+            <if test="carNumber != null" >
+                #{carNumber,jdbcType=VARCHAR},
+            </if>
+            <if test="imei != null" >
+                #{imei,jdbcType=VARCHAR},
+            </if>
+            <if test="pid != null" >
+                #{pid,jdbcType=INTEGER},
+            </if>
+            <if test="preState != null" >
+                #{preState,jdbcType=INTEGER},
+            </if>
+            <if test="type != null" >
+                #{type,jdbcType=INTEGER},
+            </if>
+            <if test="needSync != null" >
+                #{needSync,jdbcType=INTEGER},
+            </if>
+            <if test="ishd != null" >
+                #{ishd,jdbcType=INTEGER},
+            </if>
+            <if test="isclick != null" >
+                #{isclick,jdbcType=INTEGER},
+            </if>
+            <if test="prepaid != null" >
+                #{prepaid,jdbcType=NUMERIC},
+            </if>
+            <if test="prepaidPayTime != null" >
+                #{prepaidPayTime,jdbcType=BIGINT},
+            </if>
+            <if test="berthnumber != null" >
+                #{berthnumber,jdbcType=BIGINT},
+            </if>
+            <if test="berthsecId != null" >
+                #{berthsecId,jdbcType=BIGINT},
+            </if>
+            <if test="groupid != null" >
+                #{groupid,jdbcType=BIGINT},
+            </if>
+            <if test="outUid != null" >
+                #{outUid,jdbcType=BIGINT},
+            </if>
+            <if test="isUnionUser != null" >
+                #{isUnionUser,jdbcType=INTEGER},
+            </if>
+            <if test="carTypeZh != null" >
+                #{carTypeZh,jdbcType=VARCHAR},
+            </if>
+            <if test="orderIdLocal != null" >
+                #{orderIdLocal,jdbcType=VARCHAR},
+            </if>
+            <if test="duration != null" >
+                #{duration,jdbcType=BIGINT},
+            </if>
+            <if test="payTypeEn != null" >
+                #{payTypeEn,jdbcType=VARCHAR},
+            </if>
+            <if test="freereasonsLocal != null" >
+                #{freereasonsLocal,jdbcType=VARCHAR},
+            </if>
+            <if test="islocked != null" >
+                #{islocked,jdbcType=SMALLINT},
+            </if>
+            <if test="lockKey != null" >
+                #{lockKey,jdbcType=VARCHAR},
+            </if>
+            <if test="inPassid != null" >
+                #{inPassid,jdbcType=VARCHAR},
+            </if>
+            <if test="outPassid != null" >
+                #{outPassid,jdbcType=VARCHAR},
+            </if>
+            <if test="amountReceivable != null" >
+                #{amountReceivable,jdbcType=NUMERIC},
+            </if>
+            <if test="electronicPrepay != null" >
+                #{electronicPrepay,jdbcType=NUMERIC},
+            </if>
+            <if test="electronicPay != null" >
+                #{electronicPay,jdbcType=NUMERIC},
+            </if>
+            <if test="cashPrepay != null" >
+                #{cashPrepay,jdbcType=NUMERIC},
+            </if>
+            <if test="cashPay != null" >
+                #{cashPay,jdbcType=NUMERIC},
+            </if>
+            <if test="reduceAmount != null" >
+                #{reduceAmount,jdbcType=NUMERIC},
+            </if>
+            <if test="cType != null" >
+                #{cType,jdbcType=VARCHAR},
+            </if>
+            <if test="carType != null" >
+                #{carType,jdbcType=VARCHAR},
+            </if>
+            <if test="freereasons != null" >
+                #{freereasons,jdbcType=VARCHAR},
+            </if>
+            <if test="remark != null" >
+                #{remark,jdbcType=VARCHAR},
+            </if>
+            <if test="carpicTableName != null" >
+                #{carpicTableName,jdbcType=VARCHAR},
+            </if>
+            <if test="workStationUuid != null" >
+                #{workStationUuid,jdbcType=VARCHAR},
+            </if>
+            <if test="cityid != null" >
+                #{cityid,jdbcType=BIGINT},
+            </if>
+        </trim>
+    </insert>
+
+
+
+    <!--车牌出场时查询在场订单-->
+    <select id="qryOrderWhenOutPark" resultType="map">
+        SELECT
+        *
+        FROM
+        ${tableName}
+        WHERE
+         order_id_local = #{orderIdLocal,jdbcType=VARCHAR}
+        AND comid = #{comid,jdbcType=BIGINT}
+        AND car_number = #{carNumber,jdbcType=VARCHAR}
+
+        AND create_time = #{createTime,jdbcType=BIGINT}
+        AND ishd = 0
+        AND state = 0
+
+    </select>
+
+
+    <!--车牌出场时查询在场订单 数量-->
+    <select id="qryCountWhenOutPark" resultType="int">
+        SELECT
+        count(*)
+        FROM
+        ${tableName}
+        WHERE
+        order_id_local = #{orderIdLocal,jdbcType=VARCHAR}
+        AND comid = #{comid,jdbcType=BIGINT}
+        AND car_number = #{carNumber,jdbcType=VARCHAR}
+
+        AND create_time = #{createTime,jdbcType=BIGINT}
+        AND ishd = 0
+        AND state = 0
+
+    </select>
+
+
+    <select id="qryOrdersNotByCreateTime" resultType="map">
+        SELECT
+        *
+        FROM
+        ${tableName}
+        WHERE
+        order_id_local = #{orderIdLocal,jdbcType=VARCHAR}
+        AND comid = #{comid,jdbcType=BIGINT}
+        AND car_number = #{carNumber,jdbcType=VARCHAR}
+
+        AND ishd = 0
+        AND state =  #{state,jdbcType=SMALLINT}
+    </select>
+
+    <select id="qryOrdersByComidAndOrderId" resultType="map">
+        SELECT
+        *
+        FROM
+        ${tableName}
+        WHERE
+        order_id_local = #{orderIdLocal,jdbcType=VARCHAR}
+        AND comid = #{comid,jdbcType=BIGINT}
+
+        AND ishd = 0
+
+    </select>
+
+
+    <update id="updateOrderById">
+        UPDATE order_tb_new
+        <set >
+            <if test="createTime != null" >
+                create_time = #{createTime,jdbcType=BIGINT},
+            </if>
+            <if test="comid != null" >
+                comid = #{comid,jdbcType=BIGINT},
+            </if>
+            <if test="uin != null" >
+                uin = #{uin,jdbcType=BIGINT},
+            </if>
+            <if test="total != null" >
+                total = #{total,jdbcType=NUMERIC},
+            </if>
+            <if test="state != null" >
+                state = #{state,jdbcType=INTEGER},
+            </if>
+            <if test="endTime != null" >
+                end_time = #{endTime,jdbcType=BIGINT},
+            </if>
+            <if test="autoPay != null" >
+                auto_pay = #{autoPay,jdbcType=INTEGER},
+            </if>
+            <if test="payType != null" >
+                pay_type = #{payType,jdbcType=INTEGER},
+            </if>
+            <if test="nfcUuid != null" >
+                nfc_uuid = #{nfcUuid,jdbcType=VARCHAR},
+            </if>
+            <if test="uid != null" >
+                uid = #{uid,jdbcType=BIGINT},
+            </if>
+            <if test="carNumber != null" >
+                car_number = #{carNumber,jdbcType=VARCHAR},
+            </if>
+            <if test="imei != null" >
+                imei = #{imei,jdbcType=VARCHAR},
+            </if>
+            <if test="pid != null" >
+                pid = #{pid,jdbcType=INTEGER},
+            </if>
+            <if test="preState != null" >
+                pre_state = #{preState,jdbcType=INTEGER},
+            </if>
+            <if test="type != null" >
+                type = #{type,jdbcType=INTEGER},
+            </if>
+            <if test="needSync != null" >
+                need_sync = #{needSync,jdbcType=INTEGER},
+            </if>
+            <if test="ishd != null" >
+                ishd = #{ishd,jdbcType=INTEGER},
+            </if>
+            <if test="isclick != null" >
+                isclick = #{isclick,jdbcType=INTEGER},
+            </if>
+            <if test="prepaid != null" >
+                prepaid = #{prepaid,jdbcType=NUMERIC},
+            </if>
+            <if test="prepaidPayTime != null" >
+                prepaid_pay_time = #{prepaidPayTime,jdbcType=BIGINT},
+            </if>
+            <if test="berthnumber != null" >
+                berthnumber = #{berthnumber,jdbcType=BIGINT},
+            </if>
+            <if test="berthsecId != null" >
+                berthsec_id = #{berthsecId,jdbcType=BIGINT},
+            </if>
+            <if test="groupid != null" >
+                groupid = #{groupid,jdbcType=BIGINT},
+            </if>
+            <if test="outUid != null" >
+                out_uid = #{outUid,jdbcType=BIGINT},
+            </if>
+            <if test="isUnionUser != null" >
+                is_union_user = #{isUnionUser,jdbcType=INTEGER},
+            </if>
+            <if test="carTypeZh != null" >
+                car_type_zh = #{carTypeZh,jdbcType=VARCHAR},
+            </if>
+            <if test="orderIdLocal != null" >
+                order_id_local = #{orderIdLocal,jdbcType=VARCHAR},
+            </if>
+            <if test="duration != null" >
+                duration = #{duration,jdbcType=BIGINT},
+            </if>
+            <if test="payTypeEn != null" >
+                pay_type_en = #{payTypeEn,jdbcType=VARCHAR},
+            </if>
+            <if test="freereasonsLocal != null" >
+                freereasons_local = #{freereasonsLocal,jdbcType=VARCHAR},
+            </if>
+            <if test="islocked != null" >
+                islocked = #{islocked,jdbcType=SMALLINT},
+            </if>
+            <if test="lockKey != null" >
+                lock_key = #{lockKey,jdbcType=VARCHAR},
+            </if>
+            <if test="inPassid != null" >
+                in_passid = #{inPassid,jdbcType=VARCHAR},
+            </if>
+            <if test="outPassid != null" >
+                out_passid = #{outPassid,jdbcType=VARCHAR},
+            </if>
+            <if test="amountReceivable != null" >
+                amount_receivable = #{amountReceivable,jdbcType=NUMERIC},
+            </if>
+            <if test="electronicPrepay != null" >
+                electronic_prepay = #{electronicPrepay,jdbcType=NUMERIC},
+            </if>
+            <if test="electronicPay != null" >
+                electronic_pay = #{electronicPay,jdbcType=NUMERIC},
+            </if>
+            <if test="cashPrepay != null" >
+                cash_prepay = #{cashPrepay,jdbcType=NUMERIC},
+            </if>
+            <if test="cashPay != null" >
+                cash_pay = #{cashPay,jdbcType=NUMERIC},
+            </if>
+            <if test="reduceAmount != null" >
+                reduce_amount = #{reduceAmount,jdbcType=NUMERIC},
+            </if>
+            <if test="cType != null" >
+                c_type = #{cType,jdbcType=VARCHAR},
+            </if>
+            <if test="carType != null" >
+                car_type = #{carType,jdbcType=VARCHAR},
+            </if>
+            <if test="freereasons != null" >
+                freereasons = #{freereasons,jdbcType=VARCHAR},
+            </if>
+            <if test="remark != null" >
+                remark = #{remark,jdbcType=VARCHAR},
+            </if>
+            <if test="carpicTableName != null" >
+                carpic_table_name = #{carpicTableName,jdbcType=VARCHAR},
+            </if>
+            <if test="workStationUuid != null" >
+                work_station_uuid = #{workStationUuid,jdbcType=VARCHAR},
+            </if>
+        </set>
+        WHERE
+        id = #{id,jdbcType=BIGINT}
+        AND ishd = 0
+        AND MOD (cityid, 100) = #{cityid}%100
+    </update>
+
+
+    <update id="updateOrderByOrderIdAndCar">
+        UPDATE order_tb_new
+        <set >
+            <if test="createTime != null" >
+                create_time = #{createTime,jdbcType=BIGINT},
+            </if>
+            <if test="comid != null" >
+                comid = #{comid,jdbcType=BIGINT},
+            </if>
+            <if test="uin != null" >
+                uin = #{uin,jdbcType=BIGINT},
+            </if>
+            <if test="total != null" >
+                total = #{total,jdbcType=NUMERIC},
+            </if>
+            <if test="state != null" >
+                state = #{state,jdbcType=INTEGER},
+            </if>
+            <if test="endTime != null" >
+                end_time = #{endTime,jdbcType=BIGINT},
+            </if>
+            <if test="autoPay != null" >
+                auto_pay = #{autoPay,jdbcType=INTEGER},
+            </if>
+            <if test="payType != null" >
+                pay_type = #{payType,jdbcType=INTEGER},
+            </if>
+            <if test="nfcUuid != null" >
+                nfc_uuid = #{nfcUuid,jdbcType=VARCHAR},
+            </if>
+            <if test="uid != null" >
+                uid = #{uid,jdbcType=BIGINT},
+            </if>
+            <if test="carNumber != null" >
+                car_number = #{carNumber,jdbcType=VARCHAR},
+            </if>
+            <if test="imei != null" >
+                imei = #{imei,jdbcType=VARCHAR},
+            </if>
+            <if test="pid != null" >
+                pid = #{pid,jdbcType=INTEGER},
+            </if>
+            <if test="preState != null" >
+                pre_state = #{preState,jdbcType=INTEGER},
+            </if>
+            <if test="type != null" >
+                type = #{type,jdbcType=INTEGER},
+            </if>
+            <if test="needSync != null" >
+                need_sync = #{needSync,jdbcType=INTEGER},
+            </if>
+            <if test="ishd != null" >
+                ishd = #{ishd,jdbcType=INTEGER},
+            </if>
+            <if test="isclick != null" >
+                isclick = #{isclick,jdbcType=INTEGER},
+            </if>
+            <if test="prepaid != null" >
+                prepaid = #{prepaid,jdbcType=NUMERIC},
+            </if>
+            <if test="prepaidPayTime != null" >
+                prepaid_pay_time = #{prepaidPayTime,jdbcType=BIGINT},
+            </if>
+            <if test="berthnumber != null" >
+                berthnumber = #{berthnumber,jdbcType=BIGINT},
+            </if>
+            <if test="berthsecId != null" >
+                berthsec_id = #{berthsecId,jdbcType=BIGINT},
+            </if>
+            <if test="groupid != null" >
+                groupid = #{groupid,jdbcType=BIGINT},
+            </if>
+            <if test="outUid != null" >
+                out_uid = #{outUid,jdbcType=BIGINT},
+            </if>
+            <if test="isUnionUser != null" >
+                is_union_user = #{isUnionUser,jdbcType=INTEGER},
+            </if>
+            <if test="carTypeZh != null" >
+                car_type_zh = #{carTypeZh,jdbcType=VARCHAR},
+            </if>
+            <if test="orderIdLocal != null" >
+                order_id_local = #{orderIdLocal,jdbcType=VARCHAR},
+            </if>
+            <if test="duration != null" >
+                duration = #{duration,jdbcType=BIGINT},
+            </if>
+            <if test="payTypeEn != null" >
+                pay_type_en = #{payTypeEn,jdbcType=VARCHAR},
+            </if>
+            <if test="freereasonsLocal != null" >
+                freereasons_local = #{freereasonsLocal,jdbcType=VARCHAR},
+            </if>
+            <if test="islocked != null" >
+                islocked = #{islocked,jdbcType=SMALLINT},
+            </if>
+            <if test="lockKey != null" >
+                lock_key = #{lockKey,jdbcType=VARCHAR},
+            </if>
+            <if test="inPassid != null" >
+                in_passid = #{inPassid,jdbcType=VARCHAR},
+            </if>
+            <if test="outPassid != null" >
+                out_passid = #{outPassid,jdbcType=VARCHAR},
+            </if>
+            <if test="amountReceivable != null" >
+                amount_receivable = #{amountReceivable,jdbcType=NUMERIC},
+            </if>
+            <if test="electronicPrepay != null" >
+                electronic_prepay = #{electronicPrepay,jdbcType=NUMERIC},
+            </if>
+            <if test="electronicPay != null" >
+                electronic_pay = #{electronicPay,jdbcType=NUMERIC},
+            </if>
+            <if test="cashPrepay != null" >
+                cash_prepay = #{cashPrepay,jdbcType=NUMERIC},
+            </if>
+            <if test="cashPay != null" >
+                cash_pay = #{cashPay,jdbcType=NUMERIC},
+            </if>
+            <if test="reduceAmount != null" >
+                reduce_amount = #{reduceAmount,jdbcType=NUMERIC},
+            </if>
+            <if test="cType != null" >
+                c_type = #{cType,jdbcType=VARCHAR},
+            </if>
+            <if test="carType != null" >
+                car_type = #{carType,jdbcType=VARCHAR},
+            </if>
+            <if test="freereasons != null" >
+                freereasons = #{freereasons,jdbcType=VARCHAR},
+            </if>
+            <if test="remark != null" >
+                remark = #{remark,jdbcType=VARCHAR},
+            </if>
+            <if test="carpicTableName != null" >
+                carpic_table_name = #{carpicTableName,jdbcType=VARCHAR},
+            </if>
+            <if test="workStationUuid != null" >
+                work_station_uuid = #{workStationUuid,jdbcType=VARCHAR},
+            </if>
+        </set>
+        WHERE
+            order_id_local = #{orderIdLocal,jdbcType=VARCHAR}
+            AND comid = #{comid,jdbcType=BIGINT}
+            AND car_number = #{carNumber,jdbcType=VARCHAR}
+            AND MOD (cityid, 100) = #{cityid}%100
+            AND ishd = 0
+    </update>
+
+    <update id="deleteOrderByOrderIdAndCar">
+        DELETE FROM
+        ${tableName}
+        WHERE
+          order_id_local = #{orderIdLocal,jdbcType=VARCHAR}
+          AND comid = #{comid,jdbcType=BIGINT}
+          AND car_number = #{carNumber,jdbcType=VARCHAR}
+
+          AND ishd = 0
+
+    </update>
+
+</mapper>

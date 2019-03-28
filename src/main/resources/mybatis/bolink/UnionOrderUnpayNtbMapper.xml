@@ -1,0 +1,575 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.bolink.mapper.bolinkdb.UnionOrderUnpayNtbMapper" >
+  <resultMap id="BaseResultMap" type="com.bolink.dto.UnionOrderUnpayNtb" >
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="plate_number" property="plateNumber" jdbcType="VARCHAR" />
+    <result column="start_time" property="startTime" jdbcType="BIGINT" />
+    <result column="record_time" property="recordTime" jdbcType="BIGINT" />
+    <result column="union_id" property="unionId" jdbcType="BIGINT" />
+    <result column="total" property="total" jdbcType="NUMERIC" />
+    <result column="order_id" property="orderId" jdbcType="VARCHAR" />
+    <result column="park_id" property="parkId" jdbcType="VARCHAR" />
+    <result column="local_id" property="localId" jdbcType="VARCHAR" />
+    <result column="duration" property="duration" jdbcType="INTEGER" />
+    <result column="free_out_time" property="freeOutTime" jdbcType="INTEGER" />
+    <result column="query_time" property="queryTime" jdbcType="BIGINT" />
+    <result column="query_price_time" property="queryPriceTime" jdbcType="BIGINT" />
+    <result column="derate_money" property="derateMoney" jdbcType="NUMERIC" />
+    <result column="derate_duration" property="derateDuration" jdbcType="INTEGER" />
+    <result column="price" property="price" jdbcType="NUMERIC" />
+    <result column="query_order_no" property="queryOrderNo" jdbcType="VARCHAR" />
+    <result column="state" property="state" jdbcType="INTEGER" />
+    <result column="out_channel_id" property="outChannelId" jdbcType="VARCHAR" />
+    <result column="errmsg" property="errmsg" jdbcType="VARCHAR" />
+    <result column="stop_position" property="stopPosition" jdbcType="VARCHAR" />
+    <result column="trade_no" property="tradeNo" jdbcType="VARCHAR" />
+    <result column="hide_inpark_info" property="hideInparkInfo" jdbcType="INTEGER" />
+    <result column="pic_url" property="picUrl" jdbcType="VARCHAR" />
+    <result column="sub_number" property="subNumber" jdbcType="VARCHAR" />
+    <result column="prepay_money" property="prepayMoney" jdbcType="NUMERIC" />
+    <result column="multiple_prepay" property="multiplePrepay" jdbcType="INTEGER" />
+    <result column="deduction" property="deduction" jdbcType="NUMERIC" />
+  </resultMap>
+  <sql id="Example_Where_Clause" >
+    <where >
+      <foreach collection="oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause" >
+    <where >
+      <foreach collection="example.oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List" >
+    id, plate_number, start_time, record_time, union_id, total, order_id, park_id, local_id, 
+    duration, free_out_time, query_time, query_price_time, derate_money, derate_duration, 
+    price, query_order_no, state, out_channel_id, errmsg, stop_position, trade_no, hide_inpark_info, 
+    pic_url, sub_number, multiple_prepay, deduction
+  </sql>
+  <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.bolink.dto.UnionOrderUnpayNtbExample" >
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from union_order_unpay_ntb
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select 
+    <include refid="Base_Column_List" />
+    from union_order_unpay_ntb
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
+    delete from union_order_unpay_ntb
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+  <delete id="deleteByExample" parameterType="com.bolink.dto.UnionOrderUnpayNtbExample" >
+    delete from union_order_unpay_ntb
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.bolink.dto.UnionOrderUnpayNtb" >
+    insert into union_order_unpay_ntb (id, plate_number, start_time, 
+      record_time, union_id, total, 
+      order_id, park_id, local_id, 
+      duration, free_out_time, query_time, 
+      query_price_time, derate_money, derate_duration, 
+      price, query_order_no, state, 
+      out_channel_id, errmsg, stop_position, 
+      trade_no, hide_inpark_info, pic_url, 
+      sub_number, prepay_money, multiple_prepay, 
+      deduction)
+    values (#{id,jdbcType=BIGINT}, #{plateNumber,jdbcType=VARCHAR}, #{startTime,jdbcType=BIGINT}, 
+      #{recordTime,jdbcType=BIGINT}, #{unionId,jdbcType=BIGINT}, #{total,jdbcType=NUMERIC}, 
+      #{orderId,jdbcType=VARCHAR}, #{parkId,jdbcType=VARCHAR}, #{localId,jdbcType=VARCHAR}, 
+      #{duration,jdbcType=INTEGER}, #{freeOutTime,jdbcType=INTEGER}, #{queryTime,jdbcType=BIGINT}, 
+      #{queryPriceTime,jdbcType=BIGINT}, #{derateMoney,jdbcType=NUMERIC}, #{derateDuration,jdbcType=INTEGER}, 
+      #{price,jdbcType=NUMERIC}, #{queryOrderNo,jdbcType=VARCHAR}, #{state,jdbcType=INTEGER}, 
+      #{outChannelId,jdbcType=VARCHAR}, #{errmsg,jdbcType=VARCHAR}, #{stopPosition,jdbcType=VARCHAR}, 
+      #{tradeNo,jdbcType=VARCHAR}, #{hideInparkInfo,jdbcType=INTEGER}, #{picUrl,jdbcType=VARCHAR}, 
+      #{subNumber,jdbcType=VARCHAR}, #{prepayMoney,jdbcType=NUMERIC}, #{multiplePrepay,jdbcType=INTEGER}, 
+      #{deduction,jdbcType=NUMERIC})
+  </insert>
+  <insert id="insertSelective" parameterType="com.bolink.dto.UnionOrderUnpayNtb" >
+    insert into union_order_unpay_ntb
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="plateNumber != null" >
+        plate_number,
+      </if>
+      <if test="startTime != null" >
+        start_time,
+      </if>
+      <if test="recordTime != null" >
+        record_time,
+      </if>
+      <if test="unionId != null" >
+        union_id,
+      </if>
+      <if test="total != null" >
+        total,
+      </if>
+      <if test="orderId != null" >
+        order_id,
+      </if>
+      <if test="parkId != null" >
+        park_id,
+      </if>
+      <if test="localId != null" >
+        local_id,
+      </if>
+      <if test="duration != null" >
+        duration,
+      </if>
+      <if test="freeOutTime != null" >
+        free_out_time,
+      </if>
+      <if test="queryTime != null" >
+        query_time,
+      </if>
+      <if test="queryPriceTime != null" >
+        query_price_time,
+      </if>
+      <if test="derateMoney != null" >
+        derate_money,
+      </if>
+      <if test="derateDuration != null" >
+        derate_duration,
+      </if>
+      <if test="price != null" >
+        price,
+      </if>
+      <if test="queryOrderNo != null" >
+        query_order_no,
+      </if>
+      <if test="state != null" >
+        state,
+      </if>
+      <if test="outChannelId != null" >
+        out_channel_id,
+      </if>
+      <if test="errmsg != null" >
+        errmsg,
+      </if>
+      <if test="stopPosition != null" >
+        stop_position,
+      </if>
+      <if test="tradeNo != null" >
+        trade_no,
+      </if>
+      <if test="hideInparkInfo != null" >
+        hide_inpark_info,
+      </if>
+      <if test="picUrl != null" >
+        pic_url,
+      </if>
+      <if test="subNumber != null" >
+        sub_number,
+      </if>
+      <if test="prepayMoney != null" >
+        prepay_money,
+      </if>
+      <if test="multiplePrepay != null" >
+        multiple_prepay,
+      </if>
+      <if test="deduction != null" >
+        deduction,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=BIGINT},
+      </if>
+      <if test="plateNumber != null" >
+        #{plateNumber,jdbcType=VARCHAR},
+      </if>
+      <if test="startTime != null" >
+        #{startTime,jdbcType=BIGINT},
+      </if>
+      <if test="recordTime != null" >
+        #{recordTime,jdbcType=BIGINT},
+      </if>
+      <if test="unionId != null" >
+        #{unionId,jdbcType=BIGINT},
+      </if>
+      <if test="total != null" >
+        #{total,jdbcType=NUMERIC},
+      </if>
+      <if test="orderId != null" >
+        #{orderId,jdbcType=VARCHAR},
+      </if>
+      <if test="parkId != null" >
+        #{parkId,jdbcType=VARCHAR},
+      </if>
+      <if test="localId != null" >
+        #{localId,jdbcType=VARCHAR},
+      </if>
+      <if test="duration != null" >
+        #{duration,jdbcType=INTEGER},
+      </if>
+      <if test="freeOutTime != null" >
+        #{freeOutTime,jdbcType=INTEGER},
+      </if>
+      <if test="queryTime != null" >
+        #{queryTime,jdbcType=BIGINT},
+      </if>
+      <if test="queryPriceTime != null" >
+        #{queryPriceTime,jdbcType=BIGINT},
+      </if>
+      <if test="derateMoney != null" >
+        #{derateMoney,jdbcType=NUMERIC},
+      </if>
+      <if test="derateDuration != null" >
+        #{derateDuration,jdbcType=INTEGER},
+      </if>
+      <if test="price != null" >
+        #{price,jdbcType=NUMERIC},
+      </if>
+      <if test="queryOrderNo != null" >
+        #{queryOrderNo,jdbcType=VARCHAR},
+      </if>
+      <if test="state != null" >
+        #{state,jdbcType=INTEGER},
+      </if>
+      <if test="outChannelId != null" >
+        #{outChannelId,jdbcType=VARCHAR},
+      </if>
+      <if test="errmsg != null" >
+        #{errmsg,jdbcType=VARCHAR},
+      </if>
+      <if test="stopPosition != null" >
+        #{stopPosition,jdbcType=VARCHAR},
+      </if>
+      <if test="tradeNo != null" >
+        #{tradeNo,jdbcType=VARCHAR},
+      </if>
+      <if test="hideInparkInfo != null" >
+        #{hideInparkInfo,jdbcType=INTEGER},
+      </if>
+      <if test="picUrl != null" >
+        #{picUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="subNumber != null" >
+        #{subNumber,jdbcType=VARCHAR},
+      </if>
+      <if test="prepayMoney != null" >
+        #{prepayMoney,jdbcType=NUMERIC},
+      </if>
+      <if test="multiplePrepay != null" >
+        #{multiplePrepay,jdbcType=INTEGER},
+      </if>
+      <if test="deduction != null" >
+        #{deduction,jdbcType=NUMERIC},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.bolink.dto.UnionOrderUnpayNtbExample" resultType="java.lang.Integer" >
+    select count(*) from union_order_unpay_ntb
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map" >
+    update union_order_unpay_ntb
+    <set >
+      <if test="record.id != null" >
+        id = #{record.id,jdbcType=BIGINT},
+      </if>
+      <if test="record.plateNumber != null" >
+        plate_number = #{record.plateNumber,jdbcType=VARCHAR},
+      </if>
+      <if test="record.startTime != null" >
+        start_time = #{record.startTime,jdbcType=BIGINT},
+      </if>
+      <if test="record.recordTime != null" >
+        record_time = #{record.recordTime,jdbcType=BIGINT},
+      </if>
+      <if test="record.unionId != null" >
+        union_id = #{record.unionId,jdbcType=BIGINT},
+      </if>
+      <if test="record.total != null" >
+        total = #{record.total,jdbcType=NUMERIC},
+      </if>
+      <if test="record.orderId != null" >
+        order_id = #{record.orderId,jdbcType=VARCHAR},
+      </if>
+      <if test="record.parkId != null" >
+        park_id = #{record.parkId,jdbcType=VARCHAR},
+      </if>
+      <if test="record.localId != null" >
+        local_id = #{record.localId,jdbcType=VARCHAR},
+      </if>
+      <if test="record.duration != null" >
+        duration = #{record.duration,jdbcType=INTEGER},
+      </if>
+      <if test="record.freeOutTime != null" >
+        free_out_time = #{record.freeOutTime,jdbcType=INTEGER},
+      </if>
+      <if test="record.queryTime != null" >
+        query_time = #{record.queryTime,jdbcType=BIGINT},
+      </if>
+      <if test="record.queryPriceTime != null" >
+        query_price_time = #{record.queryPriceTime,jdbcType=BIGINT},
+      </if>
+      <if test="record.derateMoney != null" >
+        derate_money = #{record.derateMoney,jdbcType=NUMERIC},
+      </if>
+      <if test="record.derateDuration != null" >
+        derate_duration = #{record.derateDuration,jdbcType=INTEGER},
+      </if>
+      <if test="record.price != null" >
+        price = #{record.price,jdbcType=NUMERIC},
+      </if>
+      <if test="record.queryOrderNo != null" >
+        query_order_no = #{record.queryOrderNo,jdbcType=VARCHAR},
+      </if>
+      <if test="record.state != null" >
+        state = #{record.state,jdbcType=INTEGER},
+      </if>
+      <if test="record.outChannelId != null" >
+        out_channel_id = #{record.outChannelId,jdbcType=VARCHAR},
+      </if>
+      <if test="record.errmsg != null" >
+        errmsg = #{record.errmsg,jdbcType=VARCHAR},
+      </if>
+      <if test="record.stopPosition != null" >
+        stop_position = #{record.stopPosition,jdbcType=VARCHAR},
+      </if>
+      <if test="record.tradeNo != null" >
+        trade_no = #{record.tradeNo,jdbcType=VARCHAR},
+      </if>
+      <if test="record.hideInparkInfo != null" >
+        hide_inpark_info = #{record.hideInparkInfo,jdbcType=INTEGER},
+      </if>
+      <if test="record.picUrl != null" >
+        pic_url = #{record.picUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="record.subNumber != null" >
+        sub_number = #{record.subNumber,jdbcType=VARCHAR},
+      </if>
+      <if test="record.prepayMoney != null" >
+        prepay_money = #{record.prepayMoney,jdbcType=NUMERIC},
+      </if>
+      <if test="record.multiplePrepay != null" >
+        multiple_prepay = #{record.multiplePrepay,jdbcType=INTEGER},
+      </if>
+      <if test="record.deduction != null" >
+        deduction = #{record.deduction,jdbcType=NUMERIC},
+      </if>
+    </set>
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map" >
+    update union_order_unpay_ntb
+    set id = #{record.id,jdbcType=BIGINT},
+      plate_number = #{record.plateNumber,jdbcType=VARCHAR},
+      start_time = #{record.startTime,jdbcType=BIGINT},
+      record_time = #{record.recordTime,jdbcType=BIGINT},
+      union_id = #{record.unionId,jdbcType=BIGINT},
+      total = #{record.total,jdbcType=NUMERIC},
+      order_id = #{record.orderId,jdbcType=VARCHAR},
+      park_id = #{record.parkId,jdbcType=VARCHAR},
+      local_id = #{record.localId,jdbcType=VARCHAR},
+      duration = #{record.duration,jdbcType=INTEGER},
+      free_out_time = #{record.freeOutTime,jdbcType=INTEGER},
+      query_time = #{record.queryTime,jdbcType=BIGINT},
+      query_price_time = #{record.queryPriceTime,jdbcType=BIGINT},
+      derate_money = #{record.derateMoney,jdbcType=NUMERIC},
+      derate_duration = #{record.derateDuration,jdbcType=INTEGER},
+      price = #{record.price,jdbcType=NUMERIC},
+      query_order_no = #{record.queryOrderNo,jdbcType=VARCHAR},
+      state = #{record.state,jdbcType=INTEGER},
+      out_channel_id = #{record.outChannelId,jdbcType=VARCHAR},
+      errmsg = #{record.errmsg,jdbcType=VARCHAR},
+      stop_position = #{record.stopPosition,jdbcType=VARCHAR},
+      trade_no = #{record.tradeNo,jdbcType=VARCHAR},
+      hide_inpark_info = #{record.hideInparkInfo,jdbcType=INTEGER},
+      pic_url = #{record.picUrl,jdbcType=VARCHAR},
+      sub_number = #{record.subNumber,jdbcType=VARCHAR},
+      prepay_money = #{record.prepayMoney,jdbcType=NUMERIC},
+      multiple_prepay = #{record.multiplePrepay,jdbcType=INTEGER},
+      deduction = #{record.deduction,jdbcType=NUMERIC}
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="com.bolink.dto.UnionOrderUnpayNtb" >
+    update union_order_unpay_ntb
+    <set >
+      <if test="plateNumber != null" >
+        plate_number = #{plateNumber,jdbcType=VARCHAR},
+      </if>
+      <if test="startTime != null" >
+        start_time = #{startTime,jdbcType=BIGINT},
+      </if>
+      <if test="recordTime != null" >
+        record_time = #{recordTime,jdbcType=BIGINT},
+      </if>
+      <if test="unionId != null" >
+        union_id = #{unionId,jdbcType=BIGINT},
+      </if>
+      <if test="total != null" >
+        total = #{total,jdbcType=NUMERIC},
+      </if>
+      <if test="orderId != null" >
+        order_id = #{orderId,jdbcType=VARCHAR},
+      </if>
+      <if test="parkId != null" >
+        park_id = #{parkId,jdbcType=VARCHAR},
+      </if>
+      <if test="localId != null" >
+        local_id = #{localId,jdbcType=VARCHAR},
+      </if>
+      <if test="duration != null" >
+        duration = #{duration,jdbcType=INTEGER},
+      </if>
+      <if test="freeOutTime != null" >
+        free_out_time = #{freeOutTime,jdbcType=INTEGER},
+      </if>
+      <if test="queryTime != null" >
+        query_time = #{queryTime,jdbcType=BIGINT},
+      </if>
+      <if test="queryPriceTime != null" >
+        query_price_time = #{queryPriceTime,jdbcType=BIGINT},
+      </if>
+      <if test="derateMoney != null" >
+        derate_money = #{derateMoney,jdbcType=NUMERIC},
+      </if>
+      <if test="derateDuration != null" >
+        derate_duration = #{derateDuration,jdbcType=INTEGER},
+      </if>
+      <if test="price != null" >
+        price = #{price,jdbcType=NUMERIC},
+      </if>
+      <if test="queryOrderNo != null" >
+        query_order_no = #{queryOrderNo,jdbcType=VARCHAR},
+      </if>
+      <if test="state != null" >
+        state = #{state,jdbcType=INTEGER},
+      </if>
+      <if test="outChannelId != null" >
+        out_channel_id = #{outChannelId,jdbcType=VARCHAR},
+      </if>
+      <if test="errmsg != null" >
+        errmsg = #{errmsg,jdbcType=VARCHAR},
+      </if>
+      <if test="stopPosition != null" >
+        stop_position = #{stopPosition,jdbcType=VARCHAR},
+      </if>
+      <if test="tradeNo != null" >
+        trade_no = #{tradeNo,jdbcType=VARCHAR},
+      </if>
+      <if test="hideInparkInfo != null" >
+        hide_inpark_info = #{hideInparkInfo,jdbcType=INTEGER},
+      </if>
+      <if test="picUrl != null" >
+        pic_url = #{picUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="subNumber != null" >
+        sub_number = #{subNumber,jdbcType=VARCHAR},
+      </if>
+      <if test="prepayMoney != null" >
+        prepay_money = #{prepayMoney,jdbcType=NUMERIC},
+      </if>
+      <if test="multiplePrepay != null" >
+        multiple_prepay = #{multiplePrepay,jdbcType=INTEGER},
+      </if>
+      <if test="deduction != null" >
+        deduction = #{deduction,jdbcType=NUMERIC},
+      </if>
+    </set>
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.bolink.dto.UnionOrderUnpayNtb" >
+    update union_order_unpay_ntb
+    set plate_number = #{plateNumber,jdbcType=VARCHAR},
+      start_time = #{startTime,jdbcType=BIGINT},
+      record_time = #{recordTime,jdbcType=BIGINT},
+      union_id = #{unionId,jdbcType=BIGINT},
+      total = #{total,jdbcType=NUMERIC},
+      order_id = #{orderId,jdbcType=VARCHAR},
+      park_id = #{parkId,jdbcType=VARCHAR},
+      local_id = #{localId,jdbcType=VARCHAR},
+      duration = #{duration,jdbcType=INTEGER},
+      free_out_time = #{freeOutTime,jdbcType=INTEGER},
+      query_time = #{queryTime,jdbcType=BIGINT},
+      query_price_time = #{queryPriceTime,jdbcType=BIGINT},
+      derate_money = #{derateMoney,jdbcType=NUMERIC},
+      derate_duration = #{derateDuration,jdbcType=INTEGER},
+      price = #{price,jdbcType=NUMERIC},
+      query_order_no = #{queryOrderNo,jdbcType=VARCHAR},
+      state = #{state,jdbcType=INTEGER},
+      out_channel_id = #{outChannelId,jdbcType=VARCHAR},
+      errmsg = #{errmsg,jdbcType=VARCHAR},
+      stop_position = #{stopPosition,jdbcType=VARCHAR},
+      trade_no = #{tradeNo,jdbcType=VARCHAR},
+      hide_inpark_info = #{hideInparkInfo,jdbcType=INTEGER},
+      pic_url = #{picUrl,jdbcType=VARCHAR},
+      sub_number = #{subNumber,jdbcType=VARCHAR},
+      prepay_money = #{prepayMoney,jdbcType=NUMERIC},
+      multiple_prepay = #{multiplePrepay,jdbcType=INTEGER},
+      deduction = #{deduction,jdbcType=NUMERIC}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+</mapper>
